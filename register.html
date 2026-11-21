@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — CloudNotes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="register">
+  <div class="auth-shell">
+    <aside class="auth-aside">
+      <div>
+        <a href="index.html" class="brand-wordmark" style="color:#ffffff;font-size:21px;">CloudNotes</a>
+      </div>
+      <div>
+        <h2>Create your private student document vault in seconds.</h2>
+        <ul class="auth-aside-list">
+          <li>Email verification handled directly by Amazon Cognito</li>
+          <li>Zero-trust isolation: every document is scoped to your verified Cognito ID</li>
+          <li>Access lecture notes, lab manuals, and PDFs from any browser</li>
+        </ul>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;">
+        CloudNotes Serverless Student Document Management System
+      </div>
+    </aside>
+
+    <main class="auth-main">
+      <div class="auth-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <h1 style="font-size:22px;">Create student account</h1>
+            <p style="font-size:13.5px;color:var(--text-muted);margin-top:4px;">Register with Amazon Cognito</p>
+          </div>
+          <button id="open-aws-config" type="button" class="btn btn-secondary btn-sm">AWS Setup</button>
+        </div>
+
+        <div id="aws-setup-banner" class="alert alert-warning hidden">
+          <div>
+            <strong>AWS stack not configured.</strong> Click <strong>AWS Setup</strong> above to enter your deployed Region, Cognito User Pool ID, App Client ID, and API Gateway Base URL.
+          </div>
+        </div>
+
+        <div id="register-error" class="alert alert-error hidden"></div>
+        <div id="register-success" class="alert alert-success hidden"></div>
+
+        <form id="register-form" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="form-group">
+            <label for="reg-name" class="form-label">Full Name</label>
+            <input id="reg-name" type="text" class="form-input" placeholder="Aarav Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-email" class="form-label">Student Email</label>
+            <input id="reg-email" type="email" class="form-input" placeholder="student@university.edu" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-phone" class="form-label">Phone Number (Optional unless required by Cognito)</label>
+            <input id="reg-phone" type="tel" class="form-input mono" placeholder="+919876543210" />
+            <span class="form-hint">Include country code in E.164 format (e.g. +919876543210).</span>
+          </div>
+          <div class="form-group">
+            <label for="reg-password" class="form-label">Password</label>
+            <input id="reg-password" type="password" class="form-input" placeholder="Minimum 8 characters, upper, lower & number" minlength="8" required />
+            <span class="form-hint">At least 8 characters with uppercase, lowercase, and numeric digits.</span>
+          </div>
+          <button id="reg-submit" type="submit" class="btn btn-primary" style="width:100%;">Create account</button>
+        </form>
+
+        <form id="verify-form" class="hidden" style="display:flex;flex-direction:column;gap:16px;">
+          <p style="font-size:13.5px;color:var(--text-secondary);">
+            Enter the 6-digit verification code sent to <strong id="verify-email-label"></strong>.
+          </p>
+          <div class="form-group">
+            <label for="verify-code" class="form-label">Verification Code</label>
+            <input id="verify-code" type="text" class="form-input mono" placeholder="123456" maxlength="6" required />
+          </div>
+          <button id="verify-submit" type="submit" class="btn btn-primary" style="width:100%;">Verify email</button>
+          <button id="resend-code-btn" type="button" class="btn btn-secondary" style="width:100%;">Resend code</button>
+        </form>
+
+        <p style="font-size:13.5px;color:var(--text-secondary);text-align:center;">
+          Already registered? <a href="login.html">Sign in</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- AWS Stack Configuration Modal -->
+  <div id="aws-config-modal" class="modal-backdrop hidden">
+    <div class="modal-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 style="font-size:18px;">AWS Deployment Configuration</h2>
+        <button id="close-aws-config" type="button" class="btn btn-ghost btn-sm">Close</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);">
+        Enter the public outputs printed after running <span class="mono">sam deploy --guided</span>.
+      </p>
+      <form id="aws-config-form" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group">
+          <label for="cfg-region" class="form-label">AWS Region</label>
+          <input id="cfg-region" class="form-input mono" placeholder="ap-south-1" required />
+        </div>
+        <div class="form-group">
+          <label for="cfg-pool-id" class="form-label">Cognito User Pool ID</label>
+          <input id="cfg-pool-id" class="form-input mono" placeholder="ap-south-1_XXXXXXXXX" required />
+        </div>
+        <div class="form-group">
+          <label for="cfg-client-id" class="form-label">Cognito App Client ID</label>
+          <input id="cfg-client-id" class="form-input mono" placeholder="1abc2def3ghi4jkl..." required />
+        </div>
+        <div class="form-group">
+          <label for="cfg-api-url" class="form-label">API Gateway Base URL</label>
+          <input id="cfg-api-url" class="form-input mono" placeholder="https://xxxxxxxxxx.execute-api.ap-south-1.amazonaws.com" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save AWS Endpoints</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

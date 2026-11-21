@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — CloudNotes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="dashboard">
+  <div class="app-shell">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar">
+      <div>
+        <div style="padding:4px 10px;">
+          <a href="index.html" class="brand-wordmark">CloudNotes</a>
+        </div>
+        <nav class="sidebar-nav">
+          <button type="button" class="nav-item active" data-nav-view="overview">Dashboard</button>
+          <button type="button" class="nav-item" data-nav-view="documents">My Documents</button>
+          <button type="button" class="nav-item" data-nav-view="upload">Upload Documents</button>
+          <button type="button" class="nav-item" data-nav-view="profile">Profile & Settings</button>
+        </nav>
+      </div>
+
+      <div style="border-top:1px solid var(--border-hairline);padding-top:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:0 8px;">
+          <div id="sidebar-user-name" style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Student</div>
+          <div id="sidebar-user-email" style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">student@university.edu</div>
+        </div>
+        <button id="logout-btn" type="button" class="btn btn-secondary btn-sm" style="width:100%;">Sign out</button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="workspace-main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="mobile-menu-btn" type="button" class="btn btn-secondary btn-sm mobile-menu-btn">Menu</button>
+          <h1 id="topbar-title" style="font-size:18px;">Dashboard</h1>
+        </div>
+        <button id="topbar-upload-btn" type="button" class="btn btn-primary btn-sm">Upload Document</button>
+      </header>
+
+      <main class="workspace-content">
+        <!-- 1. Dashboard Overview Panel -->
+        <section data-view-panel="overview" style="display:flex;flex-direction:column;gap:24px;">
+          <div class="kpi-grid">
+            <div class="kpi-cell">
+              <span class="kpi-label">Total Documents</span>
+              <span id="kpi-total-docs" class="kpi-value">0</span>
+              <span class="kpi-sub">Stored in Amazon DynamoDB</span>
+            </div>
+            <div class="kpi-cell">
+              <span class="kpi-label">Storage Used</span>
+              <span id="kpi-total-storage" class="kpi-value">0 B</span>
+              <span class="kpi-sub">Private Amazon S3 bucket</span>
+            </div>
+            <div class="kpi-cell">
+              <span class="kpi-label">PDF Files</span>
+              <span id="kpi-pdf-count" class="kpi-value">0</span>
+              <span class="kpi-sub">Academic papers &amp; notes</span>
+            </div>
+            <div class="kpi-cell">
+              <span class="kpi-label">Docs, Text &amp; Images</span>
+              <span id="kpi-other-count" class="kpi-value">0</span>
+              <span class="kpi-sub">DOC, DOCX, TXT, PNG, JPG</span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;">
+            <div class="surface-card" style="padding:20px 22px;">
+              <h2 style="font-size:16px;margin-bottom:10px;">Recent Uploads</h2>
+              <div id="recent-uploads-list"></div>
+            </div>
+            <div class="surface-card" style="padding:20px 22px;">
+              <h2 style="font-size:16px;margin-bottom:10px;">Document Category Overview</h2>
+              <div id="category-breakdown"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. My Documents Panel -->
+        <section data-view-panel="documents" class="hidden" style="display:flex;flex-direction:column;gap:18px;">
+          <div class="surface-card" style="padding:16px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;">
+            <input
+              id="docs-search-input"
+              type="search"
+              class="form-input"
+              style="max-width:340px;"
+              placeholder="Search documents by filename..."
+            />
+            <div class="segmented-control">
+              <button type="button" class="segmented-btn active" data-filter-type="ALL">All</button>
+              <button type="button" class="segmented-btn" data-filter-type="PDF">PDF</button>
+              <button type="button" class="segmented-btn" data-filter-type="DOC_GROUP">Word</button>
+              <button type="button" class="segmented-btn" data-filter-type="TXT">TXT</button>
+              <button type="button" class="segmented-btn" data-filter-type="IMAGE_GROUP">Images</button>
+            </div>
+          </div>
+
+          <div id="documents-table-wrap" class="surface-card table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Type</th>
+                  <th class="text-right">Size</th>
+                  <th>Uploaded</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="documents-table-body"></tbody>
+            </table>
+          </div>
+
+          <div id="documents-empty-state" class="surface-card hidden" style="padding:48px 24px;text-align:center;">
+            <h3 style="font-size:17px;margin-bottom:6px;">No matching documents</h3>
+            <p style="font-size:14px;color:var(--text-muted);margin-bottom:18px;">
+              Upload your lecture PDFs, Word reports, or study notes to store them securely in S3.
+            </p>
+            <button type="button" class="btn btn-primary" onclick="document.querySelector('[data-nav-view=upload]').click()">
+              Upload First Document
+            </button>
+          </div>
+        </section>
+
+        <!-- 3. Upload Documents Panel -->
+        <section data-view-panel="upload" class="hidden" style="max-width:720px;">
+          <div class="surface-card" style="padding:28px;display:flex;flex-direction:column;gap:20px;">
+            <div>
+              <h2 style="font-size:18px;">Upload Academic Document</h2>
+              <p style="font-size:13.5px;color:var(--text-muted);margin-top:4px;">
+                Supported formats: PDF, DOC, DOCX, TXT, PNG, JPG · Maximum file size: 10 MB
+              </p>
+            </div>
+
+            <div id="upload-dropzone" class="dropzone">
+              <p style="font-weight:600;margin-bottom:4px;">Drop your document here, or click to browse</p>
+              <p style="font-size:13px;color:var(--text-muted);">Files transfer directly to private Amazon S3 via presigned POST</p>
+              <input id="upload-file-input" type="file" class="hidden" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
+            </div>
+
+            <div id="selected-file-card" class="surface-card hidden" style="padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+              <div>
+                <div id="selected-file-name" style="font-weight:600;font-size:14px;"></div>
+                <div id="selected-file-meta" class="tabular-nums" style="font-size:12.5px;color:var(--text-muted);"></div>
+              </div>
+              <button id="start-upload-btn" type="button" class="btn btn-primary btn-sm">Upload to S3</button>
+            </div>
+
+            <div id="upload-progress-wrap" class="hidden" style="display:flex;flex-direction:column;gap:8px;">
+              <div id="upload-progress-label" style="font-size:13px;color:var(--text-secondary);">Preparing upload...</div>
+              <div class="progress-track">
+                <div id="upload-progress-fill" class="progress-fill" style="width:0%;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Profile & Settings Panel -->
+        <section data-view-panel="profile" class="hidden" style="max-width:760px;display:flex;flex-direction:column;gap:20px;">
+          <div class="surface-card" style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h2 style="font-size:17px;">Student Account (Cognito Claims)</h2>
+              <button id="profile-logout-btn" type="button" class="btn btn-secondary btn-sm">Sign out</button>
+            </div>
+            <div style="display:grid;grid-template-columns:160px 1fr;gap:10px;font-size:14px;border-top:1px solid var(--border-hairline);padding-top:14px;">
+              <span style="color:var(--text-muted);">Name</span>
+              <span id="profile-name" style="font-weight:500;">—</span>
+              <span style="color:var(--text-muted);">Email</span>
+              <span id="profile-email" style="font-weight:500;">—</span>
+              <span style="color:var(--text-muted);">Cognito User ID</span>
+              <span id="profile-sub" class="mono" style="font-size:13px;">—</span>
+            </div>
+          </div>
+
+          <div class="surface-card" style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+            <h2 style="font-size:17px;">AWS Stack Endpoints</h2>
+            <p style="font-size:13px;color:var(--text-secondary);">
+              Public resource identifiers from your AWS SAM deployment outputs.
+            </p>
+            <form id="settings-aws-form" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div class="form-group">
+                <label for="settings-region" class="form-label">AWS Region</label>
+                <input id="settings-region" class="form-input mono" required />
+              </div>
+              <div class="form-group">
+                <label for="settings-pool-id" class="form-label">Cognito User Pool ID</label>
+                <input id="settings-pool-id" class="form-input mono" required />
+              </div>
+              <div class="form-group">
+                <label for="settings-client-id" class="form-label">Cognito App Client ID</label>
+                <input id="settings-client-id" class="form-input mono" required />
+              </div>
+              <div class="form-group">
+                <label for="settings-api-url" class="form-label">API Gateway Base URL</label>
+                <input id="settings-api-url" class="form-input mono" required />
+              </div>
+              <div style="grid-column:1 / -1;">
+                <button type="submit" class="btn btn-primary btn-sm">Update AWS Endpoints</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-backdrop hidden">
+    <div class="modal-panel">
+      <h2 style="font-size:18px;">Delete Document?</h2>
+      <p style="font-size:14px;color:var(--text-secondary);">
+        This permanently removes <strong id="delete-target-name"></strong> from Amazon S3 and deletes its metadata record from DynamoDB.
+      </p>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px;">
+        <button id="cancel-delete-btn" type="button" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-delete-btn" type="button" class="btn btn-danger">Delete document</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

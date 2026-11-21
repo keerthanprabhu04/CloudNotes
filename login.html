@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — CloudNotes</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="login">
+  <div class="auth-shell">
+    <aside class="auth-aside">
+      <div>
+        <a href="index.html" class="brand-wordmark" style="color:#ffffff;font-size:21px;">CloudNotes</a>
+      </div>
+      <div>
+        <h2>Your academic notes, verified and encrypted on AWS.</h2>
+        <ul class="auth-aside-list">
+          <li>Amazon Cognito password authentication with JWT-protected REST APIs</li>
+          <li>Private Amazon S3 bucket with server-side encryption and blocked public access</li>
+          <li>Instant DynamoDB search across PDF, DOC, DOCX, TXT, PNG, and JPG notes</li>
+        </ul>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;">
+        CloudNotes Serverless Student Document Management System
+      </div>
+    </aside>
+
+    <main class="auth-main">
+      <div class="auth-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <h1 style="font-size:22px;">Sign in to CloudNotes</h1>
+            <p style="font-size:13.5px;color:var(--text-muted);margin-top:4px;">Access your private student document vault</p>
+          </div>
+          <button id="open-aws-config" type="button" class="btn btn-secondary btn-sm">AWS Setup</button>
+        </div>
+
+        <div id="aws-setup-banner" class="alert alert-warning hidden">
+          <div>
+            <strong>AWS stack not configured.</strong> Click <strong>AWS Setup</strong> above to enter your deployed Region, Cognito User Pool ID, App Client ID, and API Gateway Base URL.
+          </div>
+        </div>
+
+        <div id="login-error" class="alert alert-error hidden"></div>
+
+        <form id="login-form" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="form-group">
+            <label for="login-email" class="form-label">Student Email</label>
+            <input id="login-email" type="email" class="form-input" placeholder="student@university.edu" required />
+          </div>
+          <div class="form-group">
+            <label for="login-password" class="form-label">Password</label>
+            <input id="login-password" type="password" class="form-input" placeholder="Enter your password" required />
+          </div>
+          <button id="login-submit" type="submit" class="btn btn-primary" style="width:100%;">Sign in</button>
+        </form>
+
+        <p style="font-size:13.5px;color:var(--text-secondary);text-align:center;">
+          New to CloudNotes? <a href="register.html">Create an account</a>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- AWS Stack Configuration Modal -->
+  <div id="aws-config-modal" class="modal-backdrop hidden">
+    <div class="modal-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 style="font-size:18px;">AWS Deployment Configuration</h2>
+        <button id="close-aws-config" type="button" class="btn btn-ghost btn-sm">Close</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);">
+        Enter the public outputs printed after running <span class="mono">sam deploy --guided</span>. No AWS secret keys are ever entered here.
+      </p>
+      <form id="aws-config-form" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group">
+          <label for="cfg-region" class="form-label">AWS Region</label>
+          <input id="cfg-region" class="form-input mono" placeholder="ap-south-1" required />
+        </div>
+        <div class="form-group">
+          <label for="cfg-pool-id" class="form-label">Cognito User Pool ID</label>
+          <input id="cfg-pool-id" class="form-input mono" placeholder="ap-south-1_XXXXXXXXX" required />
+        </div>
+        <div class="form-group">
+          <label for="cfg-client-id" class="form-label">Cognito App Client ID</label>
+          <input id="cfg-client-id" class="form-input mono" placeholder="1abc2def3ghi4jkl..." required />
+        </div>
+        <div class="form-group">
+          <label for="cfg-api-url" class="form-label">API Gateway Base URL</label>
+          <input id="cfg-api-url" class="form-input mono" placeholder="https://xxxxxxxxxx.execute-api.ap-south-1.amazonaws.com" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save AWS Endpoints</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

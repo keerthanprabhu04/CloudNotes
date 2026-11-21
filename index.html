@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudNotes — Serverless Student Document Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="landing">
+  <header class="site-header">
+    <a href="index.html" class="brand-wordmark">CloudNotes</a>
+    <nav class="header-nav">
+      <a href="#features">Capabilities</a>
+      <a href="#architecture">AWS Architecture</a>
+      <a href="login.html">Sign In</a>
+      <a href="register.html">Register</a>
+    </nav>
+    <a id="landing-primary-cta" href="login.html" class="btn btn-primary">Student Login</a>
+  </header>
+
+  <main style="max-width:1200px;margin:0 auto;padding:64px 24px 80px;">
+    <section style="max-width:740px;">
+      <p style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:12px;">
+        Serverless Academic Workspace
+      </p>
+      <h1 style="font-size:clamp(2.25rem, 4vw, 3.35rem);line-height:1.12;text-wrap:balance;margin-bottom:18px;">
+        Organize, store, and access your academic documents from anywhere.
+      </h1>
+      <p style="font-size:17px;color:var(--text-secondary);max-width:62ch;margin-bottom:28px;">
+        CloudNotes pairs Amazon Cognito authentication, private encrypted Amazon S3 storage, DynamoDB metadata indexing, and Python 3.12 AWS Lambda APIs in a clean student workspace.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;">
+        <a href="register.html" class="btn btn-primary">Create Student Account</a>
+        <a href="login.html" class="btn btn-secondary">Sign In to Workspace</a>
+      </div>
+    </section>
+
+    <section id="features" style="margin-top:64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;">
+      <div class="surface-card" style="padding:24px;">
+        <h3 style="font-size:17px;margin-bottom:8px;">Cognito JWT Security</h3>
+        <p style="font-size:14px;color:var(--text-secondary);">
+          Every student signs in with Amazon Cognito. API Gateway validates JWT claims before Lambda derives ownership strictly from your Cognito user ID.
+        </p>
+      </div>
+      <div class="surface-card" style="padding:24px;">
+        <h3 style="font-size:17px;margin-bottom:8px;">Direct S3 Presigned Transfers</h3>
+        <p style="font-size:14px;color:var(--text-secondary);">
+          Documents upload directly to a private, AES-256 encrypted Amazon S3 bucket using short-lived presigned POST policies capped at 10 MB.
+        </p>
+      </div>
+      <div class="surface-card" style="padding:24px;">
+        <h3 style="font-size:17px;margin-bottom:8px;">Instant DynamoDB Search</h3>
+        <p style="font-size:14px;color:var(--text-secondary);">
+          Metadata is partitioned by user_id in CloudNotesDocuments so listing, filtering by file type, and storage metrics load in milliseconds.
+        </p>
+      </div>
+    </section>
+
+    <section id="architecture" class="surface-card" style="margin-top:48px;padding:28px;">
+      <h2 style="font-size:20px;margin-bottom:16px;">Serverless Request Lifecycle</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--accent);margin-bottom:4px;">01. Authenticate</div>
+          <p style="font-size:13.5px;color:var(--text-secondary);">Amazon Cognito verifies student credentials and issues short-lived ID and Access JWT tokens.</p>
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--accent);margin-bottom:4px;">02. Authorize</div>
+          <p style="font-size:13.5px;color:var(--text-secondary);">API Gateway HTTP API validates the Bearer JWT and passes claims to Python 3.12 Lambda.</p>
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--accent);margin-bottom:4px;">03. Store Privately</div>
+          <p style="font-size:13.5px;color:var(--text-secondary);">Files upload straight to private S3 via presigned POST while DynamoDB tracks metadata.</p>
+        </div>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--accent);margin-bottom:4px;">04. Monitor</div>
+          <p style="font-size:13.5px;color:var(--text-secondary);">All Lambda executions and authorization errors stream automatically to Amazon CloudWatch.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
